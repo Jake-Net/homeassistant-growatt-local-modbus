@@ -28,7 +28,6 @@ from .const import (
 )
 from .sensor_types.inverter import INVERTER_POWER_SWITCH
 from .sensor_types.storage import STORAGE_SWITCH_TYPES, STORAGE_CHARGE_DISCHARGE_SWITCH_TYPES
-from .sensor_types.offgrid_switch import OFFGRID_SWITCH_TYPES
 from .sensor_types.switch_entity_description import GrowattSwitchEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,11 +67,6 @@ async def async_setup_entry(
 
     # jake-net: SPF off-grid AC-charge switch over holding register 38
     if device_type == DeviceTypes.OFFGRID_SPF:
-        for sensor in OFFGRID_SWITCH_TYPES:
-            if sensor.key not in supported_key_names:
-                continue
-            sensor_descriptions.append(sensor)
-
         if ATTR_AC_CHARGE_CURRENT in supported_key_names:
             entities.append(
                 GrowattOffgridACChargeSwitch(coordinator, entry=config_entry)

@@ -65,12 +65,13 @@ day, and manual control from the dashboard).
 
 ## Evaluation / known issues
 
-1. **Duplicate AC-charge switch.** Both the custom `GrowattOffgridACChargeSwitch`
-   and the generic switch from `OFFGRID_SWITCH_TYPES` bind register 38, so Home
-   Assistant shows `…_ac_charge_enable` and `…_ac_charge_enable_2`. They mirror
-   each other but only the custom one restores the stored current on `turn_on`;
-   the generic one writes `state_on = 1` (i.e. 1 A). Recommended cleanup: drop
-   `OFFGRID_SWITCH_TYPES` / `offgrid_switch.py` and keep the custom switch.
+1. **Duplicate AC-charge switch — removed (0.3.1-jakenet2).** Upstream previously
+   had both the custom `GrowattOffgridACChargeSwitch` and a generic switch from
+   `OFFGRID_SWITCH_TYPES` bound to register 38, so Home Assistant showed
+   `…_ac_charge_enable` and `…_ac_charge_enable_2`. The generic one wrote
+   `state_on = 1` (1 A) on `turn_on`, which silently under-charged the nightly
+   window. `offgrid_switch.py` and its use in `switch.py` are now deleted; only
+   the custom switch (restores the stored current) is created.
 2. **Debug logging left at WARNING.** `__init__.py::write_register`,
    `number.py::async_set_native_value` and the switch log at WARNING level, which
    is very noisy in the log. Should be `debug` (or removed) before any upstream PR.
