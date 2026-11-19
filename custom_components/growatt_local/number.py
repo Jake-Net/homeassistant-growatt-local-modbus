@@ -1,4 +1,6 @@
 from typing import Optional
+import logging
+_LOGGER = logging.getLogger(__name__)
 
 from homeassistant.components.number import NumberEntity
 from homeassistant.config_entries import ConfigEntry
@@ -17,7 +19,7 @@ from homeassistant.const import (
 
 from .API.const import DeviceTypes
 
-from .sensor_types.inverter import INVERTER_OUTPUT_POWER_LIMIT
+from .sensor_types.inverter import INVERTER_OUTPUT_POWER_LIMIT, INVERTER_MAX_CHARGE_CURRENT, INVERTER_AC_CHARGE_CURRENT
 from . import GrowattLocalCoordinator
 from .const import (
     CONF_FIRMWARE,
@@ -35,6 +37,10 @@ async def async_setup_entry(
     entities = []
 
     entities.append(InverterPowerLimitEntity(coordinator, entry=config_entry, description=INVERTER_OUTPUT_POWER_LIMIT))
+    entities.append(InverterPowerLimitEntity(coordinator, entry=config_entry, description=INVERTER_MAX_CHARGE_CURRENT))
+    entities.append(InverterPowerLimitEntity(coordinator, entry=config_entry, description=INVERTER_AC_CHARGE_CURRENT))
+    coordinator.get_keys_by_name(INVERTER_MAX_CHARGE_CURRENT.key, True)
+    coordinator.get_keys_by_name(INVERTER_AC_CHARGE_CURRENT.key, True)
     coordinator.get_keys_by_name(INVERTER_OUTPUT_POWER_LIMIT.key, True)
 
     async_add_entities(entities, True)
@@ -74,6 +80,7 @@ class InverterPowerLimitEntity(CoordinatorEntity, RestoreEntity, NumberEntity):
         self._attr_native_value = state.state
 
     async def async_set_native_value(self, value: float) -> None:
+        _LOGGER.warning("async_set_native_value called: key=%s value=%s", self.entity_description.key, value)
         await self.coordinator.write_register (self.entity_description.key, int(value))
         self._attr_native_value = value
         self.async_write_ha_state()

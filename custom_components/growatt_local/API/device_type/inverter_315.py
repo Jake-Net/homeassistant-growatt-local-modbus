@@ -9,6 +9,9 @@ from .base import (
     NUMBER_OF_TRACKERS_AND_PHASES_REGISTER,
     ATTR_INVERTER_ENABLED,
     ATTR_OUTPUT_POWER_LIMIT,
+    ATTR_MAX_CHARGE_CURRENT,
+    ATTR_AC_CHARGE_CURRENT,
+    ATTR_OUTPUT_SOURCE_PRIORITY,
     ATTR_INVERTER_MODEL,
     ATTR_MODBUS_VERSION,
     ATTR_STATUS_CODE,
@@ -75,8 +78,23 @@ HOLDING_REGISTERS_315: tuple[GrowattDeviceRegisters, ...] = (
         value_type=int
     ),
     GrowattDeviceRegisters(
+        name=ATTR_OUTPUT_SOURCE_PRIORITY,
+        register=1,
+        value_type=int
+    ),
+    GrowattDeviceRegisters(
         name=ATTR_OUTPUT_POWER_LIMIT,
         register=3,
+        value_type=int
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_MAX_CHARGE_CURRENT,
+        register=34,
+        value_type=int
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_AC_CHARGE_CURRENT,
+        register=38,
         value_type=int
     ),
     FIRMWARE_REGISTER,

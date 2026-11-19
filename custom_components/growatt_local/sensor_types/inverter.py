@@ -21,6 +21,8 @@ from .switch_entity_description import GrowattSwitchEntityDescription
 from ..API.device_type.base import (
     ATTR_INVERTER_ENABLED,
     ATTR_OUTPUT_POWER_LIMIT,
+    ATTR_MAX_CHARGE_CURRENT,
+    ATTR_AC_CHARGE_CURRENT,
     ATTR_INPUT_POWER,
     ATTR_INPUT_ENERGY_TOTAL,
     ATTR_INPUT_1_VOLTAGE,
@@ -100,6 +102,28 @@ INVERTER_OUTPUT_POWER_LIMIT = GrowattNumberEntityDescription(
     native_max_value=100,
     native_step=1,
     icon="mdi:transmission-tower-export",
+)
+
+INVERTER_MAX_CHARGE_CURRENT = GrowattNumberEntityDescription(
+    key=ATTR_MAX_CHARGE_CURRENT,
+    name="Max Charge Current",
+    device_class=SensorDeviceClass.CURRENT,
+    native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    native_min_value=0,
+    native_max_value=180,
+    native_step=1,
+    icon="mdi:battery-charging",
+)
+
+INVERTER_AC_CHARGE_CURRENT = GrowattNumberEntityDescription(
+    key=ATTR_AC_CHARGE_CURRENT,
+    name="AC Charge Current",
+    device_class=SensorDeviceClass.CURRENT,
+    native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    native_min_value=0,
+    native_max_value=80,
+    native_step=1,
+    icon="mdi:transmission-tower",
 )
 
 INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (

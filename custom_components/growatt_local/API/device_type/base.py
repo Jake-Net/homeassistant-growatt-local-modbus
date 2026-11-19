@@ -15,7 +15,9 @@ ATTR_MODBUS_VERSION = "modbus version"
 # Attribute names for values in the holding register
 ATTR_INVERTER_ENABLED = "inverter_enabled"
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"
-ATTR_OUTPUT_POWER_LIMIT = "output_power_limit" 
+ATTR_OUTPUT_POWER_LIMIT = "output_power_limit"
+ATTR_MAX_CHARGE_CURRENT = "max_charge_current"  # A, register 34, range 0-180A
+ATTR_AC_CHARGE_CURRENT = "ac_charge_current"  # A, register 38, range 0-100A 
 
 # Attribute names for values in the input register
 ATTR_STATUS = "status"
@@ -159,6 +161,9 @@ ATTR_AC_LOAD_TODAY = "ac_load_energy_today"  # kWh
 ATTR_AC_LOAD_TOTAL = "ac_load_energy_total"  # kWh
 
 ATTR_BATTERY_POWER = "battery_power"  # W
+
+# Attribute names for writable holding registers on SPF Offgrid inverters
+ATTR_OUTPUT_SOURCE_PRIORITY = "output_source_priority"  # 0=Solar first, 1=Utility first, 2=SBU
 
 class custom_function(type):
     """
