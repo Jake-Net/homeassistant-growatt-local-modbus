@@ -47,7 +47,8 @@ async def async_setup_entry(
     device_type = DeviceTypes(config_entry.data[CONF_TYPE])
 
     if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120,
-                       DeviceTypes.HYBRID_120, DeviceTypes.HYBRID_120_TL_XH):
+                       DeviceTypes.HYBRID_120, DeviceTypes.HYBRID_120_TL_XH,
+                       DeviceTypes.OFFGRID_SPF):
         for sensor in INVERTER_NUMBER_TYPES:
             if sensor.key not in supported_key_names:
                 continue

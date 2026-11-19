@@ -24,6 +24,8 @@ from .switch_entity_description import GrowattSwitchEntityDescription
 from ..API.device_type.base import (
     ATTR_INVERTER_ENABLED,
     ATTR_OUTPUT_POWER_LIMIT,
+    ATTR_MAX_CHARGE_CURRENT,
+    ATTR_AC_CHARGE_CURRENT,
     ATTR_EXPORT_POWER_LIMIT_ENABLE,
     ATTR_EXPORT_POWER_LIMIT_RATE,
     ATTR_INPUT_POWER,
@@ -120,6 +122,27 @@ INVERTER_NUMBER_TYPES: tuple[GrowattNumberEntityDescription, ...] = (
         native_step=1,
         mode=NumberMode.AUTO,
         icon="mdi:car-speed-limiter",
+    ),
+    # jake-net: SPF writable charge-current registers (34 and 38)
+    GrowattNumberEntityDescription(
+        key=ATTR_MAX_CHARGE_CURRENT,
+        name="Max Charge Current",
+        device_class=NumberDeviceClass.CURRENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        native_min_value=0,
+        native_max_value=180,
+        native_step=1,
+        icon="mdi:battery-charging",
+    ),
+    GrowattNumberEntityDescription(
+        key=ATTR_AC_CHARGE_CURRENT,
+        name="AC Charge Current",
+        device_class=NumberDeviceClass.CURRENT,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        native_min_value=0,
+        native_max_value=80,
+        native_step=1,
+        icon="mdi:transmission-tower",
     ),
 )
 

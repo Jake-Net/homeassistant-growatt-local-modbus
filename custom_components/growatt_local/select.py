@@ -1,4 +1,5 @@
 from typing import Optional
+import logging
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
@@ -18,13 +19,20 @@ from .API.device_type.storage_120 import ChargeDischargeMode, ChargeDischargePer
 from .sensor_types.inverter import INVERTER_SELECT_TYPES_W_METER
 from .sensor_types.storage import STORAGE_CHARGE_DISCHARGE_SELECT_TYPES
 from .sensor_types.select_entity_description import GrowattSelectEntityDescription
+from .sensor_types.offgrid_select import (
+    OFFGRID_SELECT_TYPES,
+    GrowattOffgridSelectEntityDescription,
+)
 from . import GrowattLocalCoordinator
 from .const import (
     CONF_FIRMWARE,
+    CONF_INVERTER_POWER_CONTROL,
     CONF_METER_CONNECTED,
     CONF_SERIAL_NUMBER,
     DOMAIN,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -53,7 +61,23 @@ async def async_setup_entry(
                 GrowattChargeDischargeSelectEntity(coordinator, description=item, entry=config_entry)
             )
 
-    coordinator.get_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
+    # jake-net: SPF off-grid output source priority select
+    offgrid_descriptions: list[GrowattOffgridSelectEntityDescription] = []
+    power_control = (
+        config_entry.options.get(CONF_INVERTER_POWER_CONTROL, False)
+        or config_entry.data.get(CONF_INVERTER_POWER_CONTROL, False)
+    )
+    if power_control and device_type == DeviceTypes.OFFGRID_SPF:
+        for item in OFFGRID_SELECT_TYPES:
+            if item.key not in supported_key_names:
+                continue
+            offgrid_descriptions.append(item)
+
+    coordinator.get_keys_by_name(
+        {sensor.key for sensor in sensor_descriptions}
+        | {item.key for item in offgrid_descriptions},
+        True,
+    )
 
     entities.extend(
         [
@@ -61,6 +85,15 @@ async def async_setup_entry(
                 coordinator, description=description, entry=config_entry
             )
             for description in sensor_descriptions
+        ]
+    )
+
+    entities.extend(
+        [
+            GrowattOffgridSelectEntity(
+                coordinator, description=description, entry=config_entry
+            )
+            for description in offgrid_descriptions
         ]
     )
 
@@ -154,3 +187,41 @@ class GrowattChargeDischargeSelectEntity(GrowattBaseSelectEntity):
         
         self._attr_current_option = option
         self.async_write_ha_state()
+
+
+class GrowattOffgridSelectEntity(GrowattBaseSelectEntity):
+    """SPF off-grid select entity.
+
+    The output-source-priority register decodes to a plain integer, so the
+    option<->value maps on the description are used rather than the
+    ``value_to_state_dict`` shape used by the upstream selects.
+    """
+
+    def __init__(self, coordinator, description, entry):
+        super().__init__(coordinator, entry, description)
+        self._attr_options = description.options
+        self._attr_current_option = None
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        if (state := self.coordinator.data.get(self.entity_description.key)) is None:
+            return
+
+        option = self.entity_description.value_to_option.get(int(state))
+        if option is None:
+            return
+
+        self._attr_current_option = option
+        self.async_write_ha_state()
+
+    async def async_select_option(self, option: str) -> None:
+        value = self.entity_description.option_to_value.get(option)
+        if value is None:
+            _LOGGER.error("Unknown option %s", option)
+            return
+
+        await self.coordinator.write_register(self.entity_description.key, value)
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        await self.coordinator.force_refresh()

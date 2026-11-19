@@ -35,6 +35,9 @@ ATTR_CHARGE_DISCHARGE_PERIOD_6 = "charge_discharge_period_6"
 ATTR_CHARGE_DISCHARGE_PERIOD_7 = "charge_discharge_period_7"
 ATTR_CHARGE_DISCHARGE_PERIOD_8 = "charge_discharge_period_8"
 ATTR_CHARGE_DISCHARGE_PERIOD_9 = "charge_discharge_period_9"
+# jake-net: SPF writable holding registers (register 34 and 38)
+ATTR_MAX_CHARGE_CURRENT = "max_charge_current"  # A, register 34, range 0-180A
+ATTR_AC_CHARGE_CURRENT = "ac_charge_current"  # A, register 38, range 0-100A
 
 # Attribute names for values in the input register
 ATTR_STATUS = "status"
@@ -183,6 +186,9 @@ ATTR_BATTERY_POWER = "battery_power"  # W
 
 # Attribute names for values in the meter register
 ATTR_METER_TOTAL_ACTIVE_POWER = "meter_total_active_power"  # W
+
+# jake-net: writable holding register on SPF Offgrid inverters
+ATTR_OUTPUT_SOURCE_PRIORITY = "output_source_priority"  # 0=SBU, 1=Solar first, 2=Utility first, 3=SUB
 
 class custom_function(type):
     """
